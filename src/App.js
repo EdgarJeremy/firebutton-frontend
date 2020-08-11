@@ -3,12 +3,15 @@ import ReactMapboxGl, { Layer, Feature, Marker } from 'react-mapbox-gl';
 import Mapbox from 'mapbox';
 import mapboxgl from 'mapbox-gl';
 import io from 'socket.io-client';
+import SiriusAdapter from '@edgarjeremy/sirius.adapter';
 import './App.css';
+import Reports from './Reports';
 
 const accessToken = 'pk.eyJ1IjoiZWRnYXJqZXJlbXkiLCJhIjoiY2psM25nenhmMjMwYzN2cWs1NDdpeXZyMCJ9.T-PUQmpNdO3cMRGeMtfzQQ';
 
 const mapbox = new Mapbox(accessToken);
 const socket = io('localhost:1234');
+const adapter = new SiriusAdapter('http://localhost', 1234, localStorage);
 
 const Map = ReactMapboxGl({
   accessToken: accessToken
@@ -26,18 +29,24 @@ class App extends React.Component {
     map: null,
     center: defaultCenter,
     zoom: defaultZoom,
-    data: null
+    report: null,
+    ready: false,
+    models: null,
+    overlayed: true,
+    popupReports: false
   }
 
   componentDidMount() {
-    socket.on('panic', (data) => {
-      const { user, position } = data;
-      sfx.play();
-      this.drawDirection({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude
+    adapter.connect().then((models) => {
+      this.setState({ models, ready: true });
+      socket.on('panic', (report) => {
+        sfx.play();
+        this.drawDirection({
+          latitude: report.latitude,
+          longitude: report.longitude
+        });
+        this.setState({ report });
       });
-      this.setState({ data });
     });
   }
 
@@ -83,16 +92,27 @@ class App extends React.Component {
     socket.emit('respond');
   }
 
+  onStart() {
+    this.setState({ overlayed: false });
+  }
+
   render() {
-    const { direction, center, zoom, data } = this.state;
+    const { direction, center, zoom, report, ready, overlayed, popupReports, models } = this.state;
     return (
       <div>
+        {overlayed && (
+          <div className="not-ready">
+            <button onClick={this.onStart.bind(this)} disabled={!ready}>{ready ? 'MULAI' : 'LOADING'}</button>
+          </div>
+        )}
         {direction && (
           <div className="action-buttons">
             <button onClick={this.clearDirection.bind(this)}>Hapus Jalur</button>
             <button onClick={this.onRespond.bind(this)}>Jalankan Kru</button>
           </div>
         )}
+        <button id="history-button" onClick={() => this.setState({ popupReports: true })}>Riwayat Laporan</button>
+        {(popupReports && ready) && <Reports models={models} onClose={() => this.setState({ popupReports: false })} />}
         <Map
           onStyleLoad={this.onMapReady.bind(this)}
           style="mapbox://styles/mapbox/streets-v9"
@@ -116,9 +136,9 @@ class App extends React.Component {
               <Feature coordinates={direction} />
             </Layer>
           )}
-          {data && (
+          {report && (
             <Marker
-              coordinates={[data.position.coords.longitude, data.position.coords.latitude]}
+              coordinates={[report.longitude, report.latitude]}
               anchor="bottom">
               <img style={{ width: 50, height: 50 }} src={require('./assets/fire.png')} />
             </Marker>

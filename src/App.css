@@ -67,3 +67,130 @@
 .action-buttons button:active {
   transition: scale(0.7);
 }
+
+.not-ready {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 99;
+  background-color: rgba(0,0,0,.5);
+  text-align: center;
+}
+
+.not-ready button {
+  margin-top: 25%;
+  padding: 20px;
+  font-size: 20px;
+  background-color: #2ecc71;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.not-ready button:disabled {
+  background-color: #efefef;
+  color: #aaaaaa;
+}
+
+#history-button {
+  z-index: 9;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #34495e;
+  padding: 15px;
+  color: #ffffff;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+#report-popup {
+  position: fixed;
+  top: 50px;
+  right: 50px;
+  bottom: 50px;
+  left: 50px;
+  background-color: #ffffff;
+  z-index: 9;
+}
+
+table { 
+	width: 750px; 
+	border-collapse: collapse; 
+	margin:50px auto;
+	}
+
+/* Zebra striping */
+tr:nth-of-type(odd) { 
+	background: #eee; 
+	}
+
+th { 
+	background: #3498db; 
+	color: white; 
+	font-weight: bold; 
+	}
+
+td, th { 
+	padding: 10px; 
+	border: 1px solid #ccc; 
+	text-align: left; 
+	font-size: 18px;
+	}
+
+/* 
+Max width before this PARTICULAR table gets nasty
+This query will take effect for any screen smaller than 760px
+and also iPads specifically.
+*/
+@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+	table { 
+	  	width: 100%; 
+	}
+
+	/* Force table to not be like tables anymore */
+	table, thead, tbody, th, td, tr { 
+		display: block; 
+	}
+	
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	tr { border: 1px solid #ccc; }
+	
+	td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+	}
+
+	td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		/* Label the data */
+		content: attr(data-column);
+
+		color: #000;
+		font-weight: bold;
+	}
+
+}
