@@ -12,7 +12,7 @@ export default class Reports extends React.Component {
             attributes: ['id', 'latitude', 'longitude', 'created_at', 'updated_at', 'user_id'],
             include: [{
                 model: 'User',
-                attributes: ['id', 'username', 'nik']
+                attributes: ['id', 'username', 'nik', 'phone']
             }]
         }).then((reports) => {
             this.setState({ reports });
@@ -23,7 +23,7 @@ export default class Reports extends React.Component {
         const { reports } = this.state;
         return (
             <div id="report-popup">
-                (<a href="#" onClick={this.props.onClose}>tutup</a>)
+                (<a href="#" onClick={this.props.onClose}>X</a>)
                 {reports && (
                     <table>
                         <thead>
@@ -32,6 +32,7 @@ export default class Reports extends React.Component {
                                 <th>Latitude</th>
                                 <th>Longitude</th>
                                 <th>Dibuat Pada</th>
+                                <th>Tampilkan Di Peta</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -41,6 +42,10 @@ export default class Reports extends React.Component {
                                     <td>{row.latitude}</td>
                                     <td>{row.longitude}</td>
                                     <td>{row.created_at}</td>
+                                    <td><a href="#" onClick={() => this.props.onShow({
+                                        latitude: row.latitude,
+                                        longitude: row.longitude
+                                    }, row)}>tampilkan</a></td>
                                 </tr>
                             ))}
                         </tbody>

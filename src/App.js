@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactMapboxGl, { Layer, Feature, Marker } from 'react-mapbox-gl';
+import ReactMapboxGl, { Layer, Feature, Marker, Popup } from 'react-mapbox-gl';
 import Mapbox from 'mapbox';
 import mapboxgl from 'mapbox-gl';
 import io from 'socket.io-client';
@@ -33,7 +33,8 @@ class App extends React.Component {
     ready: false,
     models: null,
     overlayed: true,
-    popupReports: false
+    popupReports: false,
+    detailPopup: false
   }
 
   componentDidMount() {
@@ -84,7 +85,7 @@ class App extends React.Component {
 
   clearDirection() {
     sfx.pause();
-    this.setState({ direction: null, data: null, center: defaultCenter, zoom: defaultZoom });
+    this.setState({ direction: null, report: null, data: null, center: defaultCenter, zoom: defaultZoom, detailPopup: false });
   }
 
   onRespond() {
@@ -96,8 +97,14 @@ class App extends React.Component {
     this.setState({ overlayed: false });
   }
 
+  showProof() {
+    const { report } = this.state;
+    this.setState({ detailPopup: true });
+    // window.open(`http://localhost:1234/proof/${report.id}`);
+  }
+
   render() {
-    const { direction, center, zoom, report, ready, overlayed, popupReports, models } = this.state;
+    const { direction, center, zoom, report, ready, overlayed, popupReports, models, detailPopup } = this.state;
     return (
       <div>
         {overlayed && (
@@ -112,7 +119,14 @@ class App extends React.Component {
           </div>
         )}
         <button id="history-button" onClick={() => this.setState({ popupReports: true })}>Riwayat Laporan</button>
-        {(popupReports && ready) && <Reports models={models} onClose={() => this.setState({ popupReports: false })} />}
+        {(popupReports && ready) && <Reports
+          models={models}
+          onClose={() => this.setState({ popupReports: false })}
+          onShow={(loc, report) => {
+            this.drawDirection(loc);
+            this.setState({ report, popupReports: false });
+          }}
+        />}
         <Map
           onStyleLoad={this.onMapReady.bind(this)}
           style="mapbox://styles/mapbox/streets-v9"
@@ -126,7 +140,7 @@ class App extends React.Component {
           <Marker
             coordinates={center}
             anchor="bottom">
-            <img style={{ width: 50, height: 50 }} src="https://cdn1.iconfinder.com/data/icons/firefighters-filled-color/300/7363545Untitled-3-512.png" />
+            <img onClick={this.showProof.bind(this)} style={{ width: 50, height: 50 }} src="https://cdn1.iconfinder.com/data/icons/firefighters-filled-color/300/7363545Untitled-3-512.png" />
           </Marker>
           {direction && (
             <Layer
@@ -139,9 +153,30 @@ class App extends React.Component {
           {report && (
             <Marker
               coordinates={[report.longitude, report.latitude]}
-              anchor="bottom">
-              <img style={{ width: 50, height: 50 }} src={require('./assets/fire.png')} />
+              anchor="bottom"
+              onClick={this.showProof.bind(this)}>
+              <img style={{ width: 50, height: 50, cursor: 'pointer' }} src={require('./assets/fire.png')} />
             </Marker>
+          )}
+          {(detailPopup && report) && (
+            <Popup
+              coordinates={[report.longitude, report.latitude]}
+              offset={{
+                'bottom-left': [12, -38], 'bottom': [0, -38], 'bottom-right': [-12, -38]
+              }}>
+              <table>
+                <tr>
+                  <td>Nama</td>
+                  <td>Nomor Telefon</td>
+                  <td>Bukti Kejadian</td>
+                </tr>
+                <tr>
+                  <td>{report.user.username}</td>
+                  <td>{report.user.phone}</td>
+                  <td><a target="_blank" href={`http://localhost:1234/proof/${report.id}`}>foto</a></td>
+                </tr>
+              </table>
+            </Popup>
           )}
         </Map>
       </div>

@@ -110,16 +110,17 @@
 
 #report-popup {
   position: fixed;
-  top: 50px;
-  right: 50px;
-  bottom: 50px;
-  left: 50px;
+  top: 100px;
+  right: 100px;
+  bottom: 100px;
+  left: 100px;
   background-color: #ffffff;
   z-index: 9;
+  overflow-x: hidden;
 }
 
 table { 
-	width: 750px; 
+	/* width: 750px;  */
 	border-collapse: collapse; 
 	margin:50px auto;
 	}
