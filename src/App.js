@@ -90,7 +90,12 @@ class App extends React.Component {
 
   onRespond() {
     sfx.pause();
-    socket.emit('respond');
+    const { report } = this.state;
+    report.update({
+      verified: true
+    }).then(() => {
+      socket.emit('respond');
+    });
   }
 
   onStart() {
@@ -101,6 +106,13 @@ class App extends React.Component {
     const { report } = this.state;
     this.setState({ detailPopup: true });
     // window.open(`http://localhost:1234/proof/${report.id}`);
+  }
+
+  onHoax() {
+    const { report } = this.state;
+    report.update({
+      verified: false
+    }).then(() => this.clearDirection());
   }
 
   render() {
@@ -116,6 +128,7 @@ class App extends React.Component {
           <div className="action-buttons">
             <button onClick={this.clearDirection.bind(this)}>Hapus Jalur</button>
             <button onClick={this.onRespond.bind(this)}>Jalankan Kru</button>
+            <button onClick={this.onHoax.bind(this)}>Tandai Hoax</button>
           </div>
         )}
         <button id="history-button" onClick={() => this.setState({ popupReports: true })}>Riwayat Laporan</button>

@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^7.1.2",
     "mapbox": "^1.0.0-beta10",
     "mapbox-gl": "^1.11.1",
+    "moment": "^2.27.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-mapbox-gl": "^4.8.6",
