@@ -179,12 +179,12 @@ class App extends React.Component {
               }}>
               <table>
                 <tr>
-                  <td>Nama</td>
+                  <td>NIK</td>
                   <td>Nomor Telefon</td>
                   <td>Bukti Kejadian</td>
                 </tr>
                 <tr>
-                  <td>{report.user.username}</td>
+                  <td>{report.user.nik}</td>
                   <td>{report.user.phone}</td>
                   <td><a target="_blank" href={`http://localhost:1234/proof/${report.id}`}>foto</a></td>
                 </tr>
