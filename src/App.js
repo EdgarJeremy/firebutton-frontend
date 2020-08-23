@@ -90,11 +90,13 @@ class App extends React.Component {
 
   onRespond() {
     sfx.pause();
-    const { report } = this.state;
-    report.update({
-      verified: true
-    }).then(() => {
-      socket.emit('respond');
+    const { report, models } = this.state;
+    models.Report.single(report.id).then((r) => {
+      r.update({
+        verified: true
+      }).then(() => {
+        socket.emit('respond');
+      });
     });
   }
 
