@@ -40,13 +40,22 @@ class App extends React.Component {
   componentDidMount() {
     adapter.connect().then((models) => {
       this.setState({ models, ready: true });
-      socket.on('panic', (report) => {
-        sfx.play();
-        this.drawDirection({
-          latitude: report.latitude,
-          longitude: report.longitude
+      socket.on('panic', (report_id) => {
+        models.Report.single(report_id, {
+          attributes: ['id', 'latitude', 'longitude', 'created_at', 'updated_at', 'verified', 'user_id'],
+          include: [{
+            model: 'User',
+            attributes: ['id', 'username', 'nik', 'phone']
+          }],
+          order: [['created_at', 'desc']]
+        }).then((report) => {
+          sfx.play();
+          this.drawDirection({
+            latitude: report.latitude,
+            longitude: report.longitude
+          });
+          this.setState({ report });
         });
-        this.setState({ report });
       });
     });
   }
